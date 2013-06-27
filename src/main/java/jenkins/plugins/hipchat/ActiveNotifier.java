@@ -123,7 +123,7 @@ public class ActiveNotifier implements FineGrainedNotifier {
             if (result == Result.FAILURE) return StringUtils.defaultIfEmpty(notifier.getMessageOnFailure(), "<b>FAILURE</b>");
             if (result == Result.ABORTED) return StringUtils.defaultIfEmpty(notifier.getMessageOnAborted(), "ABORTED");
             if (result == Result.NOT_BUILT) return StringUtils.defaultIfEmpty(notifier.getMessageOnNotBuilt(), "Not built");
-            if (result == Result.UNSTABLE) return StringUtils.defaultIfEmpty(notifier.getMessageOnUnstable(), "Unstable (troll)");
+            if (result == Result.UNSTABLE) return StringUtils.defaultIfEmpty(notifier.getMessageOnUnstable(), "Unstable");
 
             return "Unknown";
         }
