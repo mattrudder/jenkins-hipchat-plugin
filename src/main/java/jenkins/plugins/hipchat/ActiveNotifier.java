@@ -35,11 +35,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     public void started(AbstractBuild build) {
-        String changes = getChanges(build);
         CauseAction cause = build.getAction(CauseAction.class);
 
-        if (changes != null) {
-            notifyStart(build, changes);
+        if (build.hasChangeSetComputed() && build.getChangeSet().getItems().length > 0) {
+            notifyStart(build, getChanges(build));
         } else if (cause != null) {
             MessageBuilder message = new MessageBuilder(notifier, build);
             message.append(cause.getShortDescription());
@@ -73,34 +72,8 @@ public class ActiveNotifier implements FineGrainedNotifier {
     }
 
     String getChanges(AbstractBuild r) {
-        if (!r.hasChangeSetComputed()) {
-            logger.info("No change set computed...");
-            return null;
-        }
-        ChangeLogSet changeSet = r.getChangeSet();
-        List<Entry> entries = new LinkedList<Entry>();
-        Set<AffectedFile> files = new HashSet<AffectedFile>();
-        for (Object o : changeSet.getItems()) {
-            Entry entry = (Entry) o;
-            logger.info("Entry " + o);
-            entries.add(entry);
-            files.addAll(entry.getAffectedFiles());
-        }
-        if (entries.isEmpty()) {
-            logger.info("Empty change...");
-            return null;
-        }
-        Set<String> authors = new HashSet<String>();
-        for (Entry entry : entries) {
-            authors.add(entry.getAuthor().getDisplayName());
-        }
         MessageBuilder message = new MessageBuilder(notifier, r);
-        message.append("Started by changes from ");
-        message.append(StringUtils.join(authors, ", "));
-        message.append(" (");
-        message.append(files.size());
-        message.append(" file(s) changed)");
-        return message.appendOpenLink().toString();
+        return message.appendChanges().appendOpenLink().toString();
     }
 
     static String getBuildColor(AbstractBuild r) {
@@ -138,19 +111,20 @@ public class ActiveNotifier implements FineGrainedNotifier {
             return this;
         }
 
-        static String getStatusMessage(AbstractBuild r) {
+        private String getStatusMessage(AbstractBuild r) {
             if (r.isBuilding()) {
-                return "Starting...";
+                return StringUtils.defaultIfEmpty(notifier.getMessageOnStarted(), "Starting...");
             }
             Result result = r.getResult();
             Run previousBuild = r.getProject().getLastBuild().getPreviousBuild();
             Result previousResult = (previousBuild != null) ? previousBuild.getResult() : Result.SUCCESS;
-            if (result == Result.SUCCESS && previousResult == Result.FAILURE) return "Back to normal";
-            if (result == Result.SUCCESS) return "Success";
-            if (result == Result.FAILURE) return "<b>FAILURE</b>";
-            if (result == Result.ABORTED) return "ABORTED";
-            if (result == Result.NOT_BUILT) return "Not built";
-            if (result == Result.UNSTABLE) return "Unstable";
+            if (result == Result.SUCCESS && previousResult == Result.FAILURE) return StringUtils.defaultIfEmpty(notifier.getMessageOnBackToNormal(), "Back to normal");
+            if (result == Result.SUCCESS) return StringUtils.defaultIfEmpty(notifier.getMessageOnSuccess(), "Success");
+            if (result == Result.FAILURE) return StringUtils.defaultIfEmpty(notifier.getMessageOnFailure(), "<b>FAILURE</b>");
+            if (result == Result.ABORTED) return StringUtils.defaultIfEmpty(notifier.getMessageOnAborted(), "ABORTED");
+            if (result == Result.NOT_BUILT) return StringUtils.defaultIfEmpty(notifier.getMessageOnNotBuilt(), "Not built");
+            if (result == Result.UNSTABLE) return StringUtils.defaultIfEmpty(notifier.getMessageOnUnstable(), "Unstable (troll)");
+
             return "Unknown";
         }
 
@@ -161,6 +135,44 @@ public class ActiveNotifier implements FineGrainedNotifier {
 
         public MessageBuilder append(Object string) {
             message.append(string.toString());
+            return this;
+        }
+
+        public MessageBuilder appendChanges() {
+            if (!build.hasChangeSetComputed()) {
+                logger.info("No change set computed...");
+                return this;
+            }
+
+            ChangeLogSet changeSet = build.getChangeSet();
+            List<Entry> entries = new LinkedList<Entry>();
+            Set<AffectedFile> files = new HashSet<AffectedFile>();
+            for (Object o : changeSet.getItems()) {
+                Entry entry = (Entry) o;
+                logger.info("Entry " + o);
+                entries.add(entry);
+                files.addAll(entry.getAffectedFiles());
+            }
+            if (entries.isEmpty()) {
+                logger.info("Empty change...");
+                return this;
+            }
+            Set<String> authors = new HashSet<String>();
+            for (Entry entry : entries) {
+                authors.add(entry.getAuthor().getDisplayName());
+            }
+
+            String messageFormat = notifier.getMessageOnStartedByCommit();
+            if (messageFormat != null && !messageFormat.isEmpty() && StringUtils.countMatches(messageFormat, "%s") == 2) {
+                message.append(String.format(messageFormat, StringUtils.join(authors, ", "), String.valueOf(files.size())));
+            }
+            else {
+                message.append("Started by changes from ");
+                message.append(StringUtils.join(authors, ", "));
+                message.append(" (");
+                message.append(files.size());
+                message.append(" file(s) changed)");
+            }
             return this;
         }
 

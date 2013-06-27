@@ -11,18 +11,41 @@
     tags they use. Views are always organized according to its owner class,
     so it should be straightforward to find them.
   -->
-<f:section title="Global HipChat Notifier Settings">
+  <f:section title="Global HipChat Notifier Settings">
     <f:entry title="API Token" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatToken.html">
-        <f:textbox name="hipChatToken" value="${descriptor.getToken()}" />
+      <f:textbox name="hipChatToken" value="${descriptor.getToken()}" />
     </f:entry>
     <f:entry title="Room" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatRoom.html">
-        <f:textbox name="hipChatRoom" value="${descriptor.getRoom()}" />
+      <f:textbox name="hipChatRoom" value="${descriptor.getRoom()}" />
     </f:entry>
     <f:entry title="Build Server URL" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatBuildServerUrl.html">
-        <f:textbox name="hipChatBuildServerUrl" value="${descriptor.getBuildServerUrl()}" />
+      <f:textbox name="hipChatBuildServerUrl" value="${descriptor.getBuildServerUrl()}" />
     </f:entry>
     <f:entry title="Send As" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatSendAs.html">
-        <f:textbox name="hipChatSendAs" value="${descriptor.getSendAs()}" />
+      <f:textbox name="hipChatSendAs" value="${descriptor.getSendAs()}" />
+    </f:entry>
+  </f:section>
+  <f:section title="Global HipChat Notifier Messages">
+    <f:entry title="Started">
+      <f:textbox name="hipChatMessageOnStarted" value="${descriptor.getMessageOnStarted()}" />
+    </f:entry>
+    <f:entry title="Success">
+      <f:textbox name="hipChatMessageOnSuccess" value="${descriptor.getMessageOnSuccess()}" />
+    </f:entry>
+    <f:entry title="Failure">
+      <f:textbox name="hipChatMessageOnFailure" value="${descriptor.getMessageOnFailure()}" />
+    </f:entry>
+    <f:entry title="Back To Normal">
+      <f:textbox name="hipChatMessageOnBackToNormal" value="${descriptor.getMessageOnBackToNormal()}" />
+    </f:entry>
+    <f:entry title="Aborted">
+      <f:textbox name="hipChatMessageOnAborted" value="${descriptor.getMessageOnAborted()}" />
+    </f:entry>
+    <f:entry title="Not Built">
+      <f:textbox name="hipChatMessageOnNotBuilt" value="${descriptor.getMessageOnNotBuilt()}" />
+    </f:entry>
+    <f:entry title="Unstable">
+      <f:textbox name="hipChatMessageOnUnstable" value="${descriptor.getMessageOnUnstable()}" />
     </f:entry>
   </f:section>
 </j:jelly>

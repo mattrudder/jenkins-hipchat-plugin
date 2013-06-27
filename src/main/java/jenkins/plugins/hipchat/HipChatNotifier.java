@@ -26,6 +26,14 @@ public class HipChatNotifier extends Notifier {
     private String buildServerUrl;
     private String room;
     private String sendAs;
+    private String messageOnStarted;
+    private String messageOnStartedByCommit;
+    private String messageOnSuccess;
+    private String messageOnFailure;
+    private String messageOnBackToNormal;
+    private String messageOnAborted;
+    private String messageOnNotBuilt;
+    private String messageOnUnstable;
 
     @Override
     public DescriptorImpl getDescriptor() {
@@ -48,14 +56,54 @@ public class HipChatNotifier extends Notifier {
         return sendAs;
     }
 
+    public String getMessageOnStarted() {
+        return messageOnStarted;
+    }
+
+    public String getMessageOnStartedByCommit() {
+        return messageOnStartedByCommit;
+    }
+
+    public String getMessageOnSuccess() {
+        return messageOnSuccess;
+    }
+
+    public String getMessageOnFailure() {
+        return messageOnFailure;
+    }
+
+    public String getMessageOnBackToNormal() {
+        return messageOnBackToNormal;
+    }
+
+    public String getMessageOnAborted() {
+        return messageOnAborted;
+    }
+
+    public String getMessageOnNotBuilt() {
+        return messageOnNotBuilt;
+    }
+
+    public String getMessageOnUnstable() {
+        return messageOnUnstable;
+    }
+
 
     @DataBoundConstructor
-    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs) {
+    public HipChatNotifier(final String authToken, final String room, String buildServerUrl, final String sendAs, String messageOnStarted, String messageOnStartedByCommit, String messageOnSuccess, String messageOnFailure, String messageOnBackToNormal, String messageOnAborted, String messageOnNotBuilt, String messageOnUnstable) {
         super();
         this.authToken = authToken;
         this.buildServerUrl = buildServerUrl;
         this.room = room;
         this.sendAs = sendAs;
+        this.messageOnStarted = messageOnStarted;
+        this.messageOnStartedByCommit = messageOnStartedByCommit;
+        this.messageOnSuccess = messageOnSuccess;
+        this.messageOnFailure = messageOnFailure;
+        this.messageOnBackToNormal = messageOnBackToNormal;
+        this.messageOnAborted = messageOnAborted;
+        this.messageOnNotBuilt = messageOnNotBuilt;
+        this.messageOnUnstable = messageOnUnstable;
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -77,6 +125,14 @@ public class HipChatNotifier extends Notifier {
         private String room;
         private String buildServerUrl;
         private String sendAs;
+        private String messageOnStarted;
+        private String messageOnStartedByCommit;
+        private String messageOnSuccess;
+        private String messageOnFailure;
+        private String messageOnBackToNormal;
+        private String messageOnAborted;
+        private String messageOnNotBuilt;
+        private String messageOnUnstable;
 
         public DescriptorImpl() {
             load();
@@ -98,6 +154,34 @@ public class HipChatNotifier extends Notifier {
             return sendAs;
         }
 
+        public String getMessageOnStarted() {
+            return messageOnStarted;
+        }
+
+        public String getMessageOnSuccess() {
+            return messageOnSuccess;
+        }
+
+        public String getMessageOnFailure() {
+            return messageOnFailure;
+        }
+
+        public String getMessageOnBackToNormal() {
+            return messageOnBackToNormal;
+        }
+
+        public String getMessageOnAborted() {
+            return messageOnAborted;
+        }
+
+        public String getMessageOnNotBuilt() {
+            return messageOnNotBuilt;
+        }
+
+        public String getMessageOnUnstable() {
+            return messageOnUnstable;
+        }
+
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             return true;
         }
@@ -108,7 +192,15 @@ public class HipChatNotifier extends Notifier {
             if (buildServerUrl == null) buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             if (room == null) room = sr.getParameter("hipChatRoom");
             if (sendAs == null) sendAs = sr.getParameter("hipChatSendAs");
-            return new HipChatNotifier(token, room, buildServerUrl, sendAs);
+            if (messageOnStarted == null) messageOnStarted = sr.getParameter("hipChatMessageOnStarted");
+            if (messageOnStartedByCommit == null) messageOnStartedByCommit = sr.getParameter("hipChatMessageOnStartedByCommit");
+            if (messageOnSuccess == null) messageOnSuccess = sr.getParameter("hipChatMessageOnSuccess");
+            if (messageOnFailure == null) messageOnFailure = sr.getParameter("hipChatMessageOnFailure");
+            if (messageOnBackToNormal == null) messageOnBackToNormal = sr.getParameter("hipChatMessageOnBackToNormal");
+            if (messageOnAborted == null) messageOnAborted = sr.getParameter("hipChatMessageOnAborted");
+            if (messageOnNotBuilt == null) messageOnNotBuilt = sr.getParameter("hipChatMessageOnNotBuilt");
+            if (messageOnUnstable == null) messageOnUnstable = sr.getParameter("hipChatMessageOnUnstable");
+            return new HipChatNotifier(token, room, buildServerUrl, sendAs, messageOnStarted, messageOnStartedByCommit, messageOnSuccess, messageOnFailure, messageOnBackToNormal, messageOnAborted, messageOnNotBuilt, messageOnUnstable);
         }
 
         @Override
@@ -117,11 +209,20 @@ public class HipChatNotifier extends Notifier {
             room = sr.getParameter("hipChatRoom");
             buildServerUrl = sr.getParameter("hipChatBuildServerUrl");
             sendAs = sr.getParameter("hipChatSendAs");
+            messageOnStarted = sr.getParameter("hipChatMessageOnStarted");
+            messageOnStartedByCommit = sr.getParameter("hipChatMessageOnStartedByCommit");
+            messageOnSuccess = sr.getParameter("hipChatMessageOnSuccess");
+            messageOnFailure = sr.getParameter("hipChatMessageOnFailure");
+            messageOnBackToNormal = sr.getParameter("hipChatMessageOnBackToNormal");
+            messageOnAborted = sr.getParameter("hipChatMessageOnAborted");
+            messageOnNotBuilt = sr.getParameter("hipChatMessageOnNotBuilt");
+            messageOnUnstable = sr.getParameter("hipChatMessageOnUnstable");
+
             if (buildServerUrl != null && !buildServerUrl.endsWith("/")) {
                 buildServerUrl = buildServerUrl + "/";
             }
             try {
-                new HipChatNotifier(token, room, buildServerUrl, sendAs);
+                new HipChatNotifier(token, room, buildServerUrl, sendAs, messageOnStarted, messageOnStartedByCommit, messageOnSuccess, messageOnFailure, messageOnBackToNormal, messageOnAborted, messageOnNotBuilt, messageOnUnstable);
             } catch (Exception e) {
                 throw new FormException("Failed to initialize notifier - check your global notifier configuration settings", e, "");
             }
